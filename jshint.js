@@ -21,6 +21,7 @@ async function getStatus(e) {
         console.log(data.expiry) // Logs the returned data to the console of the api expiry 
         displayStatus(data)
     } else {
+        displayException(data)
         throw new Error(data.error) // Throws an error if a bad response is sent back and shows the error
         // console.log('OH NO', data.error)
     }
@@ -86,6 +87,7 @@ async function postForm(e) {
         displayErrors(data); 
         console.log(data)
     } else { 
+        displayException(data)
         throw new Error(data.error); // Standard throwing error argument.. passing the data being responded with  
     }
 }
@@ -118,5 +120,22 @@ function displayErrors(data) {
 
     // errorTitle.innerText = heading;
     // errorBody.innerHTML = results; 
+    resultsModal.show();
+}
+
+/**
+ * Displays any errors that have occurred in the modal
+ **/
+function displayException(data) {
+
+    let heading = `<div class="errormsg">An error has occured:</div>`
+
+    results = `<div>The API returned status code ${data.status_code}</div>`;
+    results += `<div>Error number: <strong>${data.error_no}</strong></div>`;
+    results += `<div>Error text: <strong>${data.error}</strong></div>`;
+
+    document.getElementById('resultsModalTitle').innerText = heading;
+    document.getElementById('results-content').innerHTML = results;
+
     resultsModal.show();
 }
