@@ -37,12 +37,48 @@ async function postForm(e) {
 
     const form = new FormData(document.getElementById("checksform"));
 
-    const response = await fetch(API_URL, {
-        method: "POST",
+    const response = await fetch(API_URL, { // awaiting as its a async function needing the response 
+        method: "POST", // Posting data to the API
         headers: {
-            "Authorization": API_KEY,
+            "Authorization": API_KEY, // The API key is used here and sent with the data to access the api
         },
-        body: form,
+        body: form, // Sending the form data to the api to be checked. From the FormData function
     });
 
+    const data = await response.json(); // Awaiting the response from the API and converting it into JSON formatting
+
+    if (response.ok) { // Checking if the response from the server/api is okay (200)
+        displayErrors(data); 
+        console.log(data)
+    } else { 
+        throw new Error(data.error); // Standard throwing error argument.. passing the data being responded with  
+    }
+}
+
+function displayErrors(data) {
+    let heading = `JSHint results for: ${data.file}: Response Code: ${data.status_code}` // Sets the heading of the modal to the string and the file being tested
+
+    if (data.total_errors === 0) {
+        results = `<div class="no_errors'>No Reported Errors in the code</div>`
+    } else {
+        results = `<div>Total Errors <span class="error_count">${data.total_errors}</span></div>`
+        for (let error of data.error_list) {
+            results += `<div>At line <span class="line">${error.line}</span>, `
+            results += `On Column <span class="column">${error.col}</span></div>` 
+            results += `<div class="error">${error.error}</div>`
+        }
+    }
+
+    // Using template literals - Modern Way
+    document.getElementById('resultsModalTitle').innerText = heading;
+    document.getElementById('results-content').innerHTML = results; // Must be HTML to display the html
+    // innerText will just show it as a text document format and show all the code
+
+    // Using the old way of declaring const's and using them to set the code - Both ways work
+    // const errorTitle = document.getElementById('resultsModalTitle')
+    // const errorBody = document.getElementById('results-content')
+
+    // errorTitle.innerText = heading;
+    // errorBody.innerHTML = results; 
+    resultsModal.show();
 }
